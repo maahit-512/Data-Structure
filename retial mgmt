@@ -1,0 +1,123 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Item {
+    string name;
+    int quantity;
+    double price;
+    Item* next;
+    Item* prev;
+};
+
+class Order {
+    Item* head;
+public:
+    Order() : head(nullptr) {}
+
+    void addItem(const string& name, int quantity, double price) {
+        Item* newItem = new Item{name, quantity, price, nullptr, nullptr};
+        if (!head) {
+            head = newItem;
+            head->next = head;
+            head->prev = head;
+        } else {
+            Item* tail = head->prev;
+            tail->next = newItem;
+            newItem->prev = tail;
+            newItem->next = head;
+            head->prev = newItem;
+        }
+    }
+
+    void removeItem(const string& name) {
+        if (!head) return;
+        Item* current = head;
+        do {
+            if (current->name == name) {
+                if (current->next == current) {
+                    delete current;
+                    head = nullptr;
+                    return;
+                }
+                current->prev->next = current->next;
+                current->next->prev = current->prev;
+                if (current == head) head = current->next;
+                delete current;
+                return;
+            }
+            current = current->next;
+        } while (current != head);
+    }
+
+    void updateItem(const string& name, int quantity, double price) {
+        if (!head) return;
+        Item* current = head;
+        do {
+            if (current->name == name) {
+                current->quantity = quantity;
+                current->price = price;
+                return;
+            }
+            current = current->next;
+        } while (current != head);
+    }
+
+    Item* searchItem(const string& name) {
+        if (!head) return nullptr;
+        Item* current = head;
+        do {
+            if (current->name == name) return current;
+            current = current->next;
+        } while (current != head);
+        return nullptr;
+    }
+
+    void display() {
+        if (!head) {
+            cout << "Order is empty.\n";
+            return;
+        }
+        Item* current = head;
+        do {
+            cout << "Item: " << current->name << ", Qty: " << current->quantity << ", Price: " << current->price << "\n";
+            current = current->next;
+        } while (current != head);
+    }
+
+    ~Order() {
+        if (!head) return;
+        Item* current = head->next;
+        while (current != head) {
+            Item* next = current->next;
+            delete current;
+            current = next;
+        }
+        delete head;
+    }
+};
+
+int main() {
+    Order order;
+    order.addItem("Apple", 5, 0.99);
+    order.addItem("Banana", 10, 0.59);
+    order.addItem("Milk", 2, 1.50);
+
+    order.display();
+
+    order.updateItem("Banana", 12, 0.55);
+    cout << "\nAfter update:\n";
+    order.display();
+
+    order.removeItem("Apple");
+    cout << "\nAfter removal:\n";
+    order.display();
+
+    Item* found = order.searchItem("Milk");
+    if (found)
+        cout << "\nFound item: " << found->name << ", Qty: " << found->quantity << ", Price: " << found->price << "\n";
+    else
+        cout << "\nItem not found.\n";
+
+    return 0;
+}
