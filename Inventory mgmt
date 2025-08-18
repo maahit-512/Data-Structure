@@ -1,0 +1,162 @@
+#include <iostream>
+using namespace std;
+struct Inventory{
+  int p_id;
+  string p_name;
+  double price;
+  int quantity;
+  Inventory * next;
+};
+Inventory* CreateNode(int p_id, string p_name, double price, int quantity){
+  Inventory* newnode = new Inventory;
+  newnode->p_id=p_id;
+  newnode->p_name=p_name;
+  newnode->price=price;
+  newnode->quantity=quantity;
+  newnode->next = nullptr;
+  return newnode;
+}
+Inventory* addProduct(Inventory* Head) {
+  int p_id;
+  string p_name;
+  double price;
+  int quantity;
+  cout<<"Enter Product ID: ";
+  cin>>p_id;
+  cout<<"Enter Product name: ";
+  cin>>p_name;
+  cout<<"Enter the price of each product: ₹";
+  cin>>price;
+  cout<<"Enter the number of products: ";
+  cin>>quantity;
+  Inventory* newnode = CreateNode(p_id, p_name, price, quantity);
+  if (!Head) return newnode;
+  Inventory* temp = Head;
+  while (temp->next != nullptr)
+  {
+    temp = temp->next;
+  }
+  temp->next = newnode;
+  return Head;
+}
+void displayProduct(Inventory* Head){
+  Inventory* temp=Head;
+  while(temp->next!=nullptr){
+    cout<<temp->p_id<<" "<<temp->p_name<<" "<<temp->price<<" "<<temp->quantity;
+    temp=temp->next;
+  }
+  cout<<"Null";
+}
+void updateInventory(Inventory* Head, int id) {
+    Inventory* temp = Head;
+    int choice, quant;
+    double newpr;
+    while (temp != nullptr) {  
+        if (temp->p_id == id) {
+            cout << "Select Choice to Update: " << endl;
+            cout << "1. Price" << endl;
+            cout << "2. Quantity" << endl;
+            cout << "Enter choice: ";
+            cin >> choice;
+            switch (choice) {
+                case 1:
+                    cout << "Enter the updated price: ₹";
+                    cin >> newpr;
+                    temp->price = newpr;
+                    cout << "Price updated successfully." << endl;
+                    break;
+                case 2:
+                    cout << "Enter the updated quantity: ";
+                    cin >> quant;
+                    temp->quantity = quant;
+                    cout << "Quantity updated successfully." << endl;
+                    break;
+                default:
+                    cout << "Invalid Choice." << endl;
+                    break;
+            }
+            return; 
+        }
+        temp = temp->next;  
+    }
+    cout << "Product with ID " << id << " not found." << endl;
+}
+Inventory* deleteProduct(Inventory* Head, int p_id) {
+    if (Head == nullptr) {
+        cout << "The inventory is empty." << endl;
+        return nullptr;
+    }
+    if (Head->p_id == p_id) {
+        Inventory* temp = Head;
+        Head = Head->next;
+        delete temp;
+        cout << "Product with ID " << p_id << " deleted successfully." << endl;
+        return Head;
+    }
+    Inventory* temp = Head;
+    Inventory* prev = nullptr;
+    while (temp != nullptr && temp->p_id != p_id) {
+        prev = temp;
+        temp = temp->next;
+    }
+    if (temp == nullptr) {
+        cout << "Product with ID " << p_id << " not found." << endl;
+        return Head;
+    }
+    prev->next = temp->next;
+    delete temp;
+    cout << "Product with ID " << p_id << " deleted successfully." << endl;
+    return Head;
+}
+double TotalValuation(Inventory* Head) {
+    double totalValuation = 0.0;
+    Inventory* temp = Head;
+
+    while (temp != nullptr) {
+        totalValuation += temp->price * temp->quantity;
+        temp = temp->next;
+    }
+    return totalValuation;
+}
+int main() {
+    Inventory* Head = nullptr;
+    int choice, id;
+    while (true) {
+        cout << "\nMenu: \n";
+        cout << "1. Add Product\n";
+        cout << "2. Display Products\n";
+        cout << "3. Update Product\n";
+        cout << "4. Delete Product\n";
+        cout << "5. View Total Valuation\n";
+        cout << "6. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+        switch (choice) {
+            case 1:
+                Head = addProduct(Head);
+                break;
+            case 2:
+                displayProduct(Head);
+                break;
+            case 3:
+                cout << "Enter Product ID to update: ";
+                cin >> id;
+                updateInventory(Head, id);
+                break;
+            case 4:
+                cout << "Enter Product ID to delete: ";
+                cin >> id;
+                Head = deleteProduct(Head, id);
+                break;
+            case 5:
+                cout << "Total Valuation of Inventory: ₹" << TotalValuation(Head) << endl;
+                break;
+            case 6:
+                cout << "Exiting..." << endl;
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+    }
+    return 0;
+}
