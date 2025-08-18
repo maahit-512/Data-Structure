@@ -1,0 +1,82 @@
+#include <iostream>
+using namespace std;
+int main() {
+    int matrix[5][4];
+    int smatrix[21][3];  
+    smatrix[0][0] = 5;
+    smatrix[0][1] = 4;
+    smatrix[0][2] = 0;
+    int k = 1;   
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j <4; j++) {
+            cout << "Enter element at indexes " << i << " " << j << " : ";
+            cin >> matrix[i][j];
+        }
+    }
+    cout << "\nRows - Students, Columns - Courses" << endl;
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 4; j++) {
+            cout << matrix[i][j] << " ";
+        }
+        cout << endl;
+    }
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (matrix[i][j] != 0) {
+                smatrix[k][0] = i;
+                smatrix[k][1] = j;
+                smatrix[k][2] = matrix[i][j];
+                k++;
+            }
+        }
+    }
+    smatrix[0][2] = k - 1;  
+    cout << "Sparse Matrix :" << endl;
+    for (int i = 0; i < k; i++) {
+        cout << smatrix[i][0] << " " << smatrix[i][1] << " " << smatrix[i][2] << endl;
+    } 
+    double student_marks[5];
+    int student_count[5];
+    double course_avg[4];
+    int course_count[4];   
+    for (int i = 0; i < 5; i++) {
+        student_marks[i] = 0;
+        student_count[i] = 0;
+    }
+    for (int j = 0; j < 4; j++) {
+        course_avg[j] = 0;
+        course_count[j] = 0;
+    }   
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 4; j++) {
+            student_marks[i] += matrix[i][j];
+            if (matrix[i][j] != 0) {
+                student_count[i]++;
+            }
+            course_avg[j] += matrix[i][j];
+            if (matrix[i][j] != 0) {
+                course_count[j]++;
+            }
+        }
+    }
+    for (int i = 0; i < 5; i++) {
+        if (student_count[i] != 0)
+            student_marks[i] = student_marks[i] / student_count[i];
+    }
+    for (int j = 0; j < 4; j++) {
+        if (course_count[j] != 0)
+            course_avg[j] = course_avg[j] / course_count[j];
+        else
+            course_avg[j] = 0;
+    }
+    cout << "Average marks per student:" << endl;
+    for (int i = 0; i < 5; i++) {
+        cout << "Student " << (i + 1) << ": " << student_marks[i] << endl;
+    }
+
+    cout << "Average marks per course:" << endl;
+    for (int j = 0; j < 4; j++) {
+        cout << "Course " << (j + 1) << ": " << course_avg[j] << endl;
+    }
+    return 0;
+}
