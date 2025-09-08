@@ -1,0 +1,102 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+const int MAX_REQUESTS = 100;
+
+struct CustomerRequest {
+    int requestID;
+    string customerName;
+    string contactInfo;
+    string serviceType;
+    bool processed;
+};
+
+class CallCenter {
+private:
+    CustomerRequest requests[MAX_REQUESTS];
+    int front;
+    int rear;
+
+public:
+    CallCenter() {
+        front = 0;
+        rear = 0;
+    }
+
+    bool isEmpty() {
+        return front == rear;
+    }
+
+    bool isFull() {
+        return rear == MAX_REQUESTS;
+    }
+
+    void addRequest(const CustomerRequest& request) {
+        if (isFull()) {
+            cout << "Request queue is full. Cannot add more requests." << endl;
+            return;
+        }
+        requests[rear] = request;
+        rear++;
+        cout << "Added request ID " << request.requestID << " for " << request.customerName << endl;
+    }
+
+    void processNextRequest() {
+        if (isEmpty()) {
+            cout << "No requests to process." << endl;
+            return;
+        }
+
+        CustomerRequest& request = requests[front];
+        cout << "Processing request ID " << request.requestID << " for " << request.customerName << endl;
+        cout << "Service Type: " << request.serviceType << endl;
+        request.processed = true;
+        front++;
+
+       
+    }
+
+    void showPendingRequests() {
+        if (isEmpty()) {
+            cout << "No pending requests." << endl;
+            return;
+        }
+
+        cout << "Pending Requests:" << endl;
+        for (int i = front; i < rear; ++i) {
+            if (!requests[i].processed) {
+                cout << "Request ID: " << requests[i].requestID
+                     << ", Customer: " << requests[i].customerName
+                     << ", Service: " << requests[i].serviceType << endl;
+            }
+        }
+    }
+};
+
+int main() {
+    CallCenter callCenter;
+
+
+    callCenter.addRequest({101, "John Doe", "555-1234", "Technical Support", false});
+    callCenter.addRequest({102, "Jane Smith", "555-5678", "Billing Inquiry", false});
+    callCenter.addRequest({103, "David Brown", "555-9012", "Product Information", false});
+
+    cout << "\nShowing pending requests:\n";
+    callCenter.showPendingRequests();
+
+    cout << "\nProcessing requests...\n";
+    callCenter.processNextRequest();
+    callCenter.processNextRequest();
+
+    cout << "\nShowing pending requests after processing two:\n";
+    callCenter.showPendingRequests();
+
+    cout << "\nAdding a new request...\n";
+    callCenter.addRequest({104, "Alice Green", "555-3456", "Technical Support", false});
+
+    cout << "\nFinal pending requests:\n";
+    callCenter.showPendingRequests();
+
+    return 0;
+}
