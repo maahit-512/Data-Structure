@@ -1,0 +1,84 @@
+#include <iostream>
+using namespace std;
+
+struct Patient {
+    int id;
+    string name;
+    int age;
+    string disease;
+    Patient* next;
+    Patient(int i, const string& n, int a, const string& d) 
+        : id(i), name(n), age(a), disease(d), next(nullptr) {}
+};
+void addPatient(Patient*& head);
+void displayPatients(Patient* head);
+void freeList(Patient*& head);
+int main() {
+    Patient* head = nullptr;
+    int choice;
+    do {
+        cout << "\n--- Hospital Management System ---\n";
+        cout << "1. Add Patient\n2. Display Patients\n3. Exit\nEnter your choice: ";
+        cin >> choice;
+        cin.ignore();  // Clean input buffer after reading integer choice
+        switch (choice) {
+            case 1:
+                addPatient(head);
+                break;
+            case 2:
+                displayPatients(head);
+                break;
+            case 3:
+                cout << "Exiting program.\n";
+                break;
+            default:
+                cout << "Invalid choice. Try again.\n";
+        }
+    } while (choice != 3);
+    freeList(head);
+    return 0;
+}
+void addPatient(Patient*& head) {
+    int id, age;
+    string name, disease;
+    cout << "Enter Patient ID: ";
+    cin >> id;
+    cin.ignore();
+    cout << "Enter Patient Name: ";
+    getline(cin, name);
+    cout << "Enter Patient Age: ";
+    cin >> age;
+    cin.ignore();
+    cout << "Enter Disease: ";
+    getline(cin, disease);
+    Patient* newPatient = new Patient(id, name, age, disease);
+    if (!head) {
+        head = newPatient;
+    } else {
+        Patient* temp = head;
+        while (temp->next) temp = temp->next;
+        temp->next = newPatient;
+    }
+    cout << "Patient added successfully.\n";
+}
+void displayPatients(Patient* head) {
+    if (!head) {
+        cout << "No patients to display.\n";
+        return;
+    }
+    cout << "\nList of Patients:\n";
+    for (Patient* temp = head; temp; temp = temp->next) {
+        cout << "ID: " << temp->id << "\n"
+             << "Name: " << temp->name << "\n"
+             << "Age: " << temp->age << "\n"
+             << "Disease: " << temp->disease << "\n"
+             << "------------------------\n";
+    }
+}
+void freeList(Patient*& head) {
+    while (head) {
+        Patient* temp = head;
+        head = head->next;
+        delete temp;
+    }
+}
