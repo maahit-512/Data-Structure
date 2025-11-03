@@ -1,0 +1,120 @@
+#include <iostream>
+using namespace std;
+const int MAX = 1005;
+int par[MAX], sz[MAX];
+struct Edge {
+    int u, v, w;
+};
+void createSet(int i) {
+    par[i] = i;
+    sz[i] = 1;
+}
+int findSet(int v) {
+    if (v == par[v]) return v;
+    return par[v] = findSet(par[v]);
+}
+void unite(int a, int b) {
+    a = findSet(a);
+    b = findSet(b);
+    if (a != b) {
+        if (sz[a] < sz[b]) swap(a, b);
+        par[b] = a;
+        sz[a] += sz[b];
+    }
+}
+void sortEdges(Edge arr[], int n) {
+    for (int i = 0; i < n - 1; ++i)
+        for (int j = i + 1; j < n; ++j)
+            if (arr[i].w > arr[j].w)
+                swap(arr[i], arr[j]);
+}
+int calcMinCost(int n, int wells[], Edge pipes[], int pipeCount) {
+    Edge all[2000];
+    int k = 0;
+    for (int i = 0; i < pipeCount; ++i)
+        all[k++] = pipes[i];
+    for (int i = 0; i < n; ++i)
+        all[k++] = {0, i + 1, wells[i]};
+    sortEdges(all, k);
+    for (int i = 0; i <= n; ++i)
+        createSet(i);
+    int total = 0, used = 0;
+    for (int i = 0; i < k; ++i) {
+        int u = all[i].u, v = all[i].v, w = all[i].w;
+        if (findSet(u) != findSet(v)) {
+            unite(u, v);
+            total += w;
+            used++;
+            if (used == n) break;
+        }
+    }
+    return total;
+}
+int main() {
+    int n = 0;
+    int wells[MAX];
+    Edge pipes[1000];
+    int pipeCount = 0;
+    int choice;
+    cout << "--- Water Supply System ---\n";
+    while (true) {
+        cout << "\n1. Add House Well Cost"
+             << "\n2. Add Pipe Connection"
+             << "\n3. Calculate Minimum Total Cost"
+             << "\n4. Display Data"
+             << "\n5. Exit"
+             << "\nEnter your choice: ";
+        cin >> choice;
+        if (choice == 1) {
+            cout << "Enter number of houses: ";
+            cin >> n;
+            for (int i = 0; i < n; ++i) {
+                cout << "Enter well cost for house " << i + 1 << ": ";
+                cin >> wells[i];
+            }
+        } 
+        else if (choice == 2) {
+            int u, v, w;
+            cout << "Enter house 1: ";
+            cin >> u;
+            cout << "Enter house 2: ";
+            cin >> v;
+            cout << "Enter pipe cost: ";
+            cin >> w;
+            pipes[pipeCount++] = {u, v, w};
+            cout << "Pipe added successfully!\n";
+        } 
+        else if (choice == 3) {
+            if (n == 0) {
+                cout << "Please add house data first.\n";
+                continue;
+            }
+            int ans = calcMinCost(n, wells, pipes, pipeCount);
+            cout << "\nMinimum Total Cost to Provide Water: " << ans << endl;
+        } 
+        else if (choice == 4) {
+            cout << "\n--- Current Data ---\n";
+            if (n == 0) cout << "No houses added.\n";
+            else {
+                cout << "Houses and Well Costs:\n";
+                for (int i = 0; i < n; ++i)
+                    cout << "House " << i + 1 << ": Well Cost = " << wells[i] << endl;
+            }
+            if (pipeCount == 0) cout << "No pipes added yet.\n";
+            else {
+                cout << "Pipes:\n";
+                for (int i = 0; i < pipeCount; ++i)
+                    cout << "From House " << pipes[i].u << " to " << pipes[i].v
+                         << " (Cost: " << pipes[i].w << ")\n";
+            }
+        } 
+        else if (choice == 5) {
+            cout << "Exiting Program. Thank you!\n";
+            break;
+        } 
+        else {
+            cout << "Invalid option! Try again.\n";
+        }
+    }
+    return 0;
+}
