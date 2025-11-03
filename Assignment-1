@@ -1,0 +1,84 @@
+#include <iostream>
+using namespace std;
+struct Contact {
+    char name[50];
+    char phone[20];
+    char email[50];
+};
+
+int strCompare(const char a[], const char b[]) {
+    int i = 0;
+    while (a[i] != '\0' && b[i] != '\0') {
+        if (a[i] != b[i]) return a[i] - b[i];
+        i++;
+    }
+    return a[i] - b[i];
+}
+Contact* linearSearch(Contact phonebook[], int n, const char searchName[]) {
+    for (int i = 0; i < n; i++) {
+        if (strCompare(phonebook[i].name, searchName) == 0) {
+            return &phonebook[i];
+        }
+    }
+    return nullptr;
+}
+
+int main() {
+    Contact phonebook[100];
+    int n = 0;
+    int choice;
+    do {
+        cout << "\n--- Phonebook Menu ---\n";
+        cout << "1. Add Contact\n";
+        cout << "2. Display All Contacts\n";
+        cout << "3. Search Contact\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+        cin.ignore();
+        if (choice == 1) {
+            cout << "Enter name: ";
+            cin.getline(phonebook[n].name, 50);
+            cout << "Enter phone: ";
+            cin.getline(phonebook[n].phone, 20);
+            cout << "Enter email: ";
+            cin.getline(phonebook[n].email, 50);
+            n++;
+        } 
+        else if (choice == 2) {
+            if (n == 0) {
+                cout << "No contacts available.\n";
+            } else {
+                cout << "\n--- Contact List ---\n";
+                for (int i = 0; i < n; i++) {
+                    cout << i + 1 << ". " << phonebook[i].name 
+                         << " | " << phonebook[i].phone 
+                         << " | " << phonebook[i].email << endl;
+                }
+            }
+        } 
+
+        else if (choice == 3) {
+            char name[50];
+            cout << "Enter name to search: ";
+            cin.getline(name, 50);
+            Contact* result = linearSearch(phonebook, n, name);
+            if (result != nullptr) {
+                cout << "\nContact Found:\n";
+                cout << "Name: " << result->name << endl;
+                cout << "Phone: " << result->phone << endl;
+                cout << "Email: " << result->email << endl;
+            } else {
+                cout << "\nContact not found!\n";
+            }
+        } 
+        else if (choice == 4) {
+            cout << "Exiting... Thanks for using.\n";
+        } 
+        else {
+            cout << "Invalid choice! Try again.\n";
+        }
+    } while (choice != 4);
+
+    return 0;
+}
