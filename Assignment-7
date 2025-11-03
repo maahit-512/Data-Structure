@@ -1,0 +1,143 @@
+#include <iostream>
+using namespace std;
+struct Ticket {
+    int id;
+    string client;
+    string service;
+    string status;
+    Ticket* next;
+    Ticket(int i, string c, string s) {
+        id = i;
+        client = c;
+        service = s;
+        status = "Pending";
+        next = NULL;
+    }
+};
+class RequestQueue {
+    Ticket* front;
+    Ticket* rear;
+    Ticket* completed;
+public:
+    RequestQueue() {
+        front = rear = NULL;
+        completed = NULL;
+    }
+    void addReq(int id, string client, string service) {
+        Ticket* node = new Ticket(id, client, service);
+        if (rear == NULL) {
+            front = rear = node;
+        } else {
+            rear->next = node;
+            rear = node;
+        }
+        cout << "Added -> ID: " << id
+             << ", Customer: " << client
+             << ", Service: " << service
+             << ", Status: Pending" << endl;
+    }
+    void preloadReq(int id, string client, string service) {
+        Ticket* node = new Ticket(id, client, service);
+        if (rear == NULL) {
+            front = rear = node;
+        } else {
+            rear->next = node;
+            rear = node;
+        }
+    }
+    void serve() {
+        if (front == NULL) {
+            cout << "No request in queue.\n";
+            return;
+        }
+        Ticket* t = front;
+        front = front->next;
+        if (front == NULL) rear = NULL;
+        t->status = "Completed";
+        cout << "Processed -> ID: " << t->id
+             << ", Customer: " << t->client
+             << ", Service: " << t->service
+             << ", Status: " << t->status << endl;
+
+        t->next = completed;
+        completed = t;
+    }
+    void showPending() {
+        if (front == NULL) {
+            cout << "No pending requests.\n";
+            return;
+        }
+        cout << "--- Pending Queue ---\n";
+        Ticket* scan = front;
+        while (scan != NULL) {
+            cout << "ID: " << scan->id
+                 << ", Customer: " << scan->client
+                 << ", Service: " << scan->service
+                 << ", Status: " << scan->status << endl;
+            scan = scan->next;
+        }
+    }
+    void showAll() {
+        cout << "--- Completed First, Then Pending ---\n";
+        Ticket* done = completed;
+        while (done != NULL) {
+            cout << "ID: " << done->id
+                 << ", Customer: " << done->client
+                 << ", Service: " << done->service
+                 << ", Status: " << done->status << endl;
+            done = done->next;
+        }
+        Ticket* left = front;
+        while (left != NULL) {
+            cout << "ID: " << left->id
+                 << ", Customer: " << left->client
+                 << ", Service: " << left->service
+                 << ", Status: " << left->status << endl;
+            left = left->next;
+        }
+    }
+};
+int main() {
+    RequestQueue rq;
+    int choice, id;
+    string client, service;
+    rq.preloadReq(201, "Alice Johnson", "Technical Support");
+    rq.preloadReq(202, "Bob Miller", "Billing");
+    rq.preloadReq(203, "Charlie Evans", "General Inquiry");
+    while (true) {
+        cout << "\n--- Service Desk ---\n"
+             << "1. Add New Request\n"
+             << "2. Process Next\n"
+             << "3. View Pending\n"
+             << "4. View All\n"
+             << "5. Exit\n"
+             << "Select: ";
+        cin >> choice;
+        switch (choice) {
+            case 1:
+                cout << "Enter Ticket ID: ";
+                cin >> id;
+                cin.ignore();
+                cout << "Enter Customer Name: ";
+                getline(cin, client);
+                cout << "Enter Service: ";
+                getline(cin, service);
+                rq.addReq(id, client, service);
+                break;
+            case 2:
+                rq.serve();
+                break;
+            case 3:
+                rq.showPending();
+                break;
+            case 4:
+                rq.showAll();
+                break;
+            case 5:
+                cout << "Goodbye!\n";
+                return 0;
+            default:
+                cout << "Invalid option.\n";
+        }
+    }
+}
