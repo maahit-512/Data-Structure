@@ -1,0 +1,138 @@
+#include <iostream>
+using namespace std;
+struct Meal {
+    int id;
+    string customer;
+    string food;
+    string status;
+};
+class CircularQ {
+    Meal* arr;
+    int front, rear, size, cap;
+public:
+    CircularQ(int c) {
+        cap = c;
+        arr = new Meal[cap];
+        front = rear = -1;
+        size = 0;
+    }
+    bool isFull() { return (size == cap); }
+    bool isEmpty() { return (size == 0); }
+    void enqueue(int id, string cust, string food) {
+        if (isFull()) {
+            cout << "Order queue is full.\n";
+            return;
+        }
+        rear = (rear + 1) % cap;
+        arr[rear].id = id;
+        arr[rear].customer = cust;
+        arr[rear].food = food;
+        arr[rear].status = "Pending";
+        if (front == -1) front = rear;
+        size++;
+        cout << "New Order -> ID: " << id
+             << ", Customer: " << cust
+             << ", Items: " << food
+             << ", Status: Pending\n";
+    }
+    void preload(int id, string cust, string food) {
+        if (isFull()) return;
+        rear = (rear + 1) % cap;
+        arr[rear].id = id;
+        arr[rear].customer = cust;
+        arr[rear].food = food;
+        arr[rear].status = "Pending";
+        if (front == -1) front = rear;
+        size++;
+    }
+    void serveOrder() {
+        if (isEmpty()) {
+            cout << "No orders waiting.\n";
+            return;
+        }
+        Meal &cur = arr[front];
+        cout << "Serving Order ID: " << cur.id
+             << ", Customer: " << cur.customer
+             << ", Items: " << cur.food << endl;
+        cur.status = "Completed";
+        front = (front + 1) % cap;
+        size--;
+    }
+    void listPending() {
+        if (isEmpty()) {
+            cout << "No pending orders.\n";
+            return;
+        }
+        cout << "--- Pending List ---\n";
+        int count = 0, i = front;
+        while (count < size) {
+            cout << "ID: " << arr[i].id
+                 << ", Customer: " << arr[i].customer
+                 << ", Items: " << arr[i].food
+                 << ", Status: " << arr[i].status << endl;
+            i = (i + 1) % cap;
+            count++;
+        }
+    }
+    void listAll() {
+        if (isEmpty()) {
+            cout << "System has no orders.\n";
+            return;
+        }
+        cout << "--- All Orders in Queue ---\n";
+        int count = 0, i = front;
+        while (count < size) {
+            cout << "ID: " << arr[i].id
+                 << ", Customer: " << arr[i].customer
+                 << ", Items: " << arr[i].food
+                 << ", Status: " << arr[i].status << endl;
+            i = (i + 1) % cap;
+            count++;
+        }
+    }
+};
+int main() {
+    CircularQ q(10);
+    q.preload(201, "Ananya Mehta", "Veg Burger, Fries, Coke");
+    q.preload(202, "Karan Singh", "Paneer Wrap, Salad, Lemonade");
+    q.preload(203, "Simran Kapoor", "Cheese Pizza, Garlic Bread, Soda");
+    int choice, id;
+    string cust, food;
+    while (true) {
+        cout << "\n=== Drive-Thru Counter ===\n"
+             << "1. Place New Order\n"
+             << "2. Serve Order\n"
+             << "3. Show Pending Orders\n"
+             << "4. Show All Orders\n"
+             << "5. Exit\n"
+             << "Your choice: ";
+        cin >> choice;
+        cin.ignore();
+        switch (choice) {
+            case 1:
+                cout << "Enter Order ID: ";
+                cin >> id;
+                cin.ignore();
+                cout << "Enter Customer Name: ";
+                getline(cin, cust);
+                cout << "Enter Items: ";
+                getline(cin, food);
+                q.enqueue(id, cust, food);
+                break;
+            case 2:
+                q.serveOrder();
+                break;
+            case 3:
+                q.listPending();
+                break;
+            case 4:
+                q.listAll();
+                break;
+            case 5:
+                cout << "Visit Again!\n";
+                return 0;
+            default:
+                cout << "Invalid option.\n";
+        }
+    }
+}
