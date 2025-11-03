@@ -1,0 +1,82 @@
+#include <iostream>
+using namespace std;
+struct Contact {
+    int id;
+    string name, phone, email;
+};
+struct Node {
+    Contact data;
+    Node *left, *right;
+    int height;
+    Node(Contact c) : data(c), left(NULL), right(NULL), height(1) {}
+};
+int h(Node* n) { return n ? n->height : 0; }
+int bal(Node* n) { return n ? h(n->left) - h(n->right) : 0; }
+Node* rRight(Node* y) {
+    Node* x = y->left;
+    y->left = x->right; x->right = y;
+    y->height = max(h(y->left), h(y->right)) + 1;
+    x->height = max(h(x->left), h(x->right)) + 1;
+    return x;
+}
+Node* rLeft(Node* x) {
+    Node* y = x->right;
+    x->right = y->left; y->left = x;
+    x->height = max(h(x->left), h(x->right)) + 1;
+    y->height = max(h(y->left), h(y->right)) + 1;
+    return y;
+}
+Node* insert(Node* r, Contact c) {
+    if (!r) return new Node(c);
+    if (c.name < r->data.name) r->left = insert(r->left, c);
+    else if (c.name > r->data.name) r->right = insert(r->right, c);
+    else return r;
+    r->height = 1 + max(h(r->left), h(r->right));
+    int b = bal(r);
+    if (b > 1 && c.name < r->left->data.name) return rRight(r);
+    if (b < -1 && c.name > r->right->data.name) return rLeft(r);
+    if (b > 1 && c.name > r->left->data.name) { r->left = rLeft(r->left); return rRight(r); }
+    if (b < -1 && c.name < r->right->data.name) { r->right = rRight(r->right); return rLeft(r); }
+    return r;
+}
+void in(Node* r) {
+    if (!r) return;
+    in(r->left);
+    cout << r->data.id << " | " << r->data.name << " | " << r->data.phone << " | " << r->data.email << endl;
+    in(r->right);
+}
+void byName(Node* r, string n) {
+    if (!r) { cout << "Not found\n"; return; }
+    if (r->data.name == n) cout << r->data.id << " | " << r->data.name << " | " << r->data.phone << " | " << r->data.email << endl;
+    else if (n < r->data.name) byName(r->left, n);
+    else byName(r->right, n);
+}
+bool update(Node* r, string n, string p, string e) {
+    if (!r) return false;
+    if (r->data.name == n) { r->data.phone = p; r->data.email = e; cout << "Updated\n"; return true; }
+    if (n < r->data.name) return update(r->left, n, p, e);
+    return update(r->right, n, p, e);
+}
+int main() {
+    Node* root = NULL;
+    int ch, id; string name, phone, email;
+    root = insert(root, {101, "Rahul Sharma", "9876543210", "rahul@example.com"});
+    root = insert(root, {102, "Priya Patel", "1234567890", "priya@example.com"});
+    root = insert(root, {103, "Aarav Gupta", "8765432109", "aarav@example.com"});
+    do {
+        cout << "\n1.Add Contact\n2.Show All\n3.Search by Name\n4.Update Contact\n5.Exit\nEnter: ";
+        cin >> ch;
+        if (ch == 1) {
+            cout << "ID: "; cin >> id;
+            cin.ignore();
+            cout << "Name: "; getline(cin, name);
+            cout << "Phone: "; getline(cin, phone);
+            cout << "Email: "; getline(cin, email);
+            root = insert(root, {id, name, phone, email});
+        } else if (ch == 2) in(root);
+        else if (ch == 3) { cin.ignore(); cout << "Name: "; getline(cin, name); byName(root, name); }
+        else if (ch == 4) { cin.ignore(); cout << "Name: "; getline(cin, name); cout << "New Phone: "; getline(cin, phone); cout << "New Email: "; getline(cin, email); update(root, name, phone, email); }
+        else if (ch == 5) cout << "Goodbye\n";
+        else cout << "Invalid\n";
+    } while (ch != 5);
+}
