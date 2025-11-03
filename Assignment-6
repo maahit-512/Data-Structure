@@ -1,0 +1,81 @@
+#include <iostream>
+using namespace std;
+char stackArr[100];
+int top = -1;
+void pushChar(char c) {
+    stackArr[++top] = c;
+}
+char popChar() {
+    return stackArr[top--];
+}
+int precedence(char c) {
+    if (c == '+' || c == '-') return 1;
+    if (c == '*' || c == '/') return 2;
+    if (c == '^') return 3;
+    return -1;
+}
+bool isRightAssoc(char c) {
+    return (c == '^');
+}
+string toPostfix(string exp) {
+    string output = "";
+    top = -1;
+    for (int i = 0; i < (int)exp.size(); i++) {
+        char c = exp[i];
+        if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            output += c;
+        }
+        else if (c == '(') {
+            pushChar(c);
+        }
+        else if (c == ')') {
+            while (top != -1 && stackArr[top] != '(') {
+                output += popChar();
+            }
+            if (top != -1) popChar();
+        }
+        else {
+            while (top != -1 &&
+                   ((precedence(stackArr[top]) > precedence(c)) ||
+                    (precedence(stackArr[top]) == precedence(c) && !isRightAssoc(c))) &&
+                   stackArr[top] != '(') {
+                output += popChar();
+            }
+            pushChar(c);
+        }
+    }
+    while (top != -1) {
+        output += popChar();
+    }
+    return output;
+}
+string toPrefix(string exp) {
+    int n = exp.length();
+    for (int i = 0; i < n / 2; i++) {
+        char tmp = exp[i];
+        exp[i] = exp[n - i - 1];
+        exp[n - i - 1] = tmp;
+    }
+    for (int i = 0; i < n; i++) {
+        if (exp[i] == '(') exp[i] = ')';
+        else if (exp[i] == ')') exp[i] = '(';
+    }
+    string post = toPostfix(exp);
+    int m = post.size();
+    for (int i = 0; i < m / 2; i++) {
+        char tmp = post[i];
+        post[i] = post[m - i - 1];
+        post[m - i - 1] = tmp;
+    }
+    return post;
+}
+int main() {
+    string exp;
+    cout << "Enter an infix expression: ";
+    cin >> exp;
+    string post = toPostfix(exp);
+    string pre = toPrefix(exp);
+    cout << "Converted to Postfix: " << post << endl;
+    cout << "Converted to Prefix: " << pre << endl;
+    return 0;
+}
