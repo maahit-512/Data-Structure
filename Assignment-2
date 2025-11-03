@@ -1,0 +1,57 @@
+#include <iostream>
+using namespace std;
+int main() {
+    int values[100];
+    int count = 0, option;
+    do {
+        cout << "\n--- Temperature Program ---\n";
+        cout << "1. Enter Readings\n";
+        cout << "2. Show Readings\n";
+        cout << "3. Arrange in Ascending Order\n";
+        cout << "4. Exit\n";
+        cout << "Choose an option: ";
+        cin >> option;
+        if (option == 1) {
+            cout << "How many readings? ";
+            cin >> count;
+            cout << "Enter " << count << " values:\n";
+            for (int i = 0; i < count; i++) {
+                cin >> values[i];
+            }
+        }
+        else if (option == 2) {
+            if (count == 0) {
+                cout << "No readings entered yet.\n";
+            } else {
+                cout << "Current readings:\n";
+                for (int i = 0; i < count; i++) {
+                    cout << values[i] << " ";
+                }
+                cout << endl;
+            }
+        }
+        else if (option == 3) {
+            if (count == 0) {
+                cout << "No data available to arrange.\n";
+            } else {
+                for (int i = 0; i < count - 1; i++) {
+                    for (int j = 0; j < count - i - 1; j++) {
+                        if (values[j] > values[j + 1]) {
+                            int swapper = values[j];
+                            values[j] = values[j + 1];
+                            values[j + 1] = swapper;
+                        }
+                    }
+                }
+                cout << "Values arranged successfully.\n";
+            }
+        }
+        else if (option == 4) {
+            cout << "Thanks for using \n";
+        }
+        else {
+            cout << "Invalid choice. Try again.\n";
+        }
+    } while (option != 4);
+    return 0;
+}
