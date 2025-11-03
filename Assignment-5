@@ -1,0 +1,186 @@
+#include <iostream>
+using namespace std;
+
+struct Product {
+    int id;
+    string name;
+    int quantity;
+    float price;
+    Product* next;
+};
+
+Product* head = NULL;
+
+void addProduct(int id, string name, int quantity, float price) {
+    Product* node = new Product;
+    node->id = id;
+    node->name = name;
+    node->quantity = quantity;
+    node->price = price;
+    node->next = NULL;
+
+    if (head == NULL) {
+        head = node;
+    } else {
+        Product* walk = head;
+        while (walk->next != NULL) {
+            walk = walk->next;
+        }
+        walk->next = node;
+    }
+}
+
+void showProducts() {
+    if (head == NULL) {
+        cout << "No items in inventory.\n";
+        return;
+    }
+
+    cout << "\n--- Inventory List ---\n";
+    Product* scan = head;
+    while (scan != NULL) {
+        cout << "ID: " << scan->id
+             << " | Name: " << scan->name
+             << " | Quantity: " << scan->quantity
+             << " | Price: $" << scan->price << endl;
+        scan = scan->next;
+    }
+}
+
+void editProduct(int id) {
+    Product* p = head;
+    bool flag = false;
+
+    while (p != NULL) {
+        if (p->id == id) {
+            flag = true;
+            int ch;
+            cout << "\n1. Change Quantity & Price\n2. Modify Quantity only\nChoice: ";
+            cin >> ch;
+
+            if (ch == 1) {
+                int qty; float pr;
+                cout << "Enter new Quantity: ";
+                cin >> qty;
+                cout << "Enter new Price: ";
+                cin >> pr;
+                p->quantity = qty;
+                p->price = pr;
+                cout << "Details updated.\n";
+            } else if (ch == 2) {
+                int diff;
+                cout << "Enter quantity adjustment: ";
+                cin >> diff;
+                p->quantity += diff;
+                if (p->quantity < 0) p->quantity = 0;
+                cout << "Now Quantity = " << p->quantity << endl;
+            } else {
+                cout << "Invalid input.\n";
+            }
+            break;
+        }
+        p = p->next;
+    }
+
+    if (!flag) cout << "Item not found.\n";
+}
+
+void removeProduct(int id) {
+    if (head == NULL) {
+        cout << "Nothing to delete.\n";
+        return;
+    }
+
+    if (head->id == id) {
+        Product* gone = head;
+        head = head->next;
+        delete gone;
+        cout << "Item removed.\n";
+        return;
+    }
+
+    Product* temp = head;
+    while (temp->next != NULL && temp->next->id != id) {
+        temp = temp->next;
+    }
+
+    if (temp->next == NULL) {
+        cout << "Item not found.\n";
+    } else {
+        Product* gone = temp->next;
+        temp->next = temp->next->next;
+        delete gone;
+        cout << "Item removed.\n";
+    }
+}
+
+void calculateValue() {
+    float total = 0;
+    Product* node = head;
+    while (node != NULL) {
+        total += node->quantity * node->price;
+        node = node->next;
+    }
+    cout << "Total Stock Value = $" << total << endl;
+}
+
+int main() {
+    addProduct(101, "Laptop", 50, 800);
+    addProduct(102, "Smartphone", 100, 500);
+    addProduct(103, "Tablet", 30, 400);
+
+    int option;
+    do {
+        cout << "\n=== Inventory Menu ===\n"
+             << "1. Add Item\n"
+             << "2. Show All\n"
+             << "3. Edit Item\n"
+             << "4. Remove Item\n"
+             << "5. Total Worth\n"
+             << "6. Exit\n"
+             << "Choice: ";
+        cin >> option;
+
+        if (option == 1) {
+            int id, qty;
+            float price;
+            string nm;
+            cout << "ID: ";
+            cin >> id;
+            cin.ignore();
+            cout << "Name: ";
+            getline(cin, nm);
+            cout << "Quantity: ";
+            cin >> qty;
+            cout << "Price: ";
+            cin >> price;
+            addProduct(id, nm, qty, price);
+        } 
+        else if (option == 2) {
+            showProducts();
+        } 
+        else if (option == 3) {
+            int id;
+            cout << "Enter ID to edit: ";
+            cin >> id;
+            editProduct(id);
+        } 
+        else if (option == 4) {
+            int id;
+            cout << "Enter ID to delete: ";
+            cin >> id;
+            removeProduct(id);
+        } 
+        else if (option == 5) {
+            calculateValue();
+        } 
+        else if (option == 6) {
+            cout << "Exiting...Thank you\n";
+        } 
+        else {
+            cout << "Wrong option.\n";
+        }
+    } while (option != 6);
+
+    return 0;
+}
